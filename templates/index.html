@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CardsSuggestingGirl</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}" type="text/css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function showImages(imgUrls) {
+            let container = $('#image-container');
+            container.empty();
+
+            imgUrls.forEach(url => {
+                let img = $('<img>').attr('src', url).css('width', '33%');
+                container.append(img);
+            });
+        }
+
+        $(document).ready(function() {
+            $("#submit-btn").click(function() {
+                const userInput = $("#user-input").val();
+                let container = $('#image-container');
+                container.empty();
+                container.append("in progress…")
+                $.ajax({
+                    url: '/get_response',
+                    type: 'POST',
+                    data: {
+                        user_input: userInput
+                    },
+                    success: function(response) {
+                        container.empty();
+                        let img = $('<img>').attr('src', response.image_url);
+                        container.append(img);
+                    },
+                    error: function(error) {
+                        container.empty();
+                        container.append("error");
+                        console.log(error);
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+
+    <h2>英語のインポートリストを張り付ける</h2>
+    <textarea id="user-input" rows="20" cols="50"></textarea><br>
+    <button id="submit-btn">画像にする</button>
+    <hr>
+    <div id="image-container"></div>
+</body>
+</html>
