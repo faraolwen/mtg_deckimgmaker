@@ -39,6 +39,24 @@ button {
     cursor: pointer;
 }
 
+select {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 15px 16px; 
+    text-align: center;
+    font-size: 16px;
+    margin: 4px 2px;
+    display: inline-block;  /* ボタンと同じ行に配置 */
+    cursor: pointer;  /* ポインターのスタイルをハンドに */
+}
+
+/* プルダウンメニューのオプションのスタイル */
+select option {
+    background-color: white;
+    color: black;
+}
+
 button:hover {
     background-color: #45a049;
 }

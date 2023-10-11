@@ -20,6 +20,7 @@
         $(document).ready(function() {
             $("#submit-btn").click(function() {
                 const userInput = $("#user-input").val();
+                const widthChoice = $("#width-choice").val();
                 let container = $('#image-container');
                 container.empty();
                 container.append("in progress…")
@@ -27,7 +28,8 @@
                     url: '/get_response',
                     type: 'POST',
                     data: {
-                        user_input: userInput
+                        user_input: userInput,
+                        width_choice: widthChoice
                     },
                     success: function(response) {
                         container.empty();
@@ -46,8 +48,12 @@
 </head>
 <body>
 
-    <h2>英語のインポートリストを張り付ける</h2>
+    <h2>MTGの英語のインポートリストを張ってください</h2>
     <textarea id="user-input" rows="20" cols="50"></textarea><br>
+    <select name="width-choice" id="width-choice">
+        <option value="horizonally">横長</option>
+        <option value="vertivally">縦長</option>
+    </select>
     <button id="submit-btn">画像にする</button>
     <hr>
     <div id="image-container"></div>

@@ -88,14 +88,17 @@ def concat_images(img_list,img_side_list, grid):
 
 
         # テキストの位置を計算
-        x = img_width - text_width - 5  # 5はマージンとして追加
+        x = img_width - text_width - 10  # 5はマージンとして追加
         y = img_height - text_height - 15
 
         # 白い背景の枠を描画
         draw.rectangle([x-5, y-5, x+text_width+5, y+text_height+10], fill="white")  # 5は枠のマージンとして追加
 
         # 黒い番号を描画
-        draw.text((x, y), str(number), fill="black", font=font)
+        if int(number) >= 10:
+            draw.text((x-8, y), str(number), fill="black", font=font)
+        else:
+            draw.text((x, y), str(number), fill="black", font=font)
         x_offset = (i % cols) * max([img[1].width for img in img_list])
         y_offset = (i // cols) * max([img[1].height for img in img_list])
         dst.paste(img, (x_offset, y_offset))
@@ -124,7 +127,10 @@ def concat_images(img_list,img_side_list, grid):
         draw.rectangle([x-5, y-5, x+text_width+5, y+text_height+10], fill="white")  # 5は枠のマージンとして追加
 
         # 黒い番号を描画
-        draw.text((x, y), str(number), fill="black", font=font)
+        if int(number) >= 10:
+            draw.text((x-8, y), str(number), fill="black", font=font)
+        else:
+            draw.text((x, y), str(number), fill="black", font=font)
         x_offset = (i % cols) * max([img[1].width for img in img_list])
         y_offset = int(((i // cols) + (len(img_list) -1 )//cols + 1.15)  * max([img[1].height for img in img_list]))
         dst.paste(img, (x_offset, y_offset))
@@ -219,7 +225,7 @@ def get_imgfiles(deck, sort_by = "mv" ):
 
     return deck_images
 
-def show_deckimg(import_list):
+def show_deckimg(import_list, cards_in_row = 10):
     try:
         #message = await ctx.send("in progress...")
         import_list = import_list.split("\n")
@@ -232,6 +238,9 @@ def show_deckimg(import_list):
         for card in import_list:
             if card == "Sideboard" or (card == "" and len(main_deck) > 0):
                 list_to_add = sideboard
+                if len(main_deck) == 1 and "Companion" in import_list:
+                    main_deck = []
+                    list_to_add = main_deck
             if len(card.split(" ")) > 1:
                 n_card, card_name = card.split(" ",1)
                 if n_card.isdecimal():
@@ -239,7 +248,7 @@ def show_deckimg(import_list):
         main_cardimgs = get_imgfiles(main_deck, sort_by = "mv")
         side_cardimgs = get_imgfiles(sideboard, sort_by = "color")  
 
-        result_img = concat_images(main_cardimgs, side_cardimgs, ((len(main_cardimgs)-1) // 10  + max(0, (len(side_cardimgs)-1)//10) + 2.15, 10))
+        result_img = concat_images(main_cardimgs, side_cardimgs, ((len(main_cardimgs)-1) // cards_in_row  + max(0, (len(side_cardimgs)-1)//cards_in_row) + 2.15, cards_in_row))
         return result_img
     except Exception as e:
         print(e)
@@ -248,8 +257,12 @@ def show_deckimg(import_list):
 @app.route('/get_response', methods=['POST'])
 def get_response():
     import_list = request.form['user_input']
-    print(import_list)
-    img = show_deckimg(import_list)
+    width = request.form['width_choice']
+    print(width)
+    cards_in_row = 10
+    if width == "vertivally":
+        cards_in_row = 5
+    img = show_deckimg(import_list, cards_in_row)
 
     temp_filename = os.path.join(TEMP_FOLDER, f"{uuid.uuid4()}.png")
     img.save(temp_filename)
